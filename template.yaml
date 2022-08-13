@@ -28,7 +28,7 @@ Globals:
     TracingEnabled: True
 
 Resources:
-  ServerlessApi:
+  ServerlessRestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
@@ -60,7 +60,7 @@ Resources:
           Properties:
             Path: /
             Method: GET
-            RestApiId: !Ref ServerlessApi
+            RestApiId: !Ref ServerlessRestApi
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -89,7 +89,7 @@ Resources:
           Properties:
             Path: /{id}
             Method: GET
-            RestApiId: !Ref ServerlessApi
+            RestApiId: !Ref ServerlessRestApi
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -118,7 +118,7 @@ Resources:
           Properties:
             Path: /
             Method: POST
-            RestApiId: !Ref ServerlessApi
+            RestApiId: !Ref ServerlessRestApi
 
   statusFunction:
     Type: AWS::Serverless::Function
@@ -144,7 +144,7 @@ Resources:
           Properties:
             Path: /status
             Method: GET
-            RestApiId: !Ref ServerlessApi
+            RestApiId: !Ref ServerlessRestApi
   # Simple syntax to create a DynamoDB table with a single attribute primary key, more in
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
 
