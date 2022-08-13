@@ -6,7 +6,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ApplicationName:
-    Type: string
+    Type: String
     Default: etsy-clone-api
 Description: >-
   etsy-clone-api
