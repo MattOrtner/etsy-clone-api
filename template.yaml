@@ -8,8 +8,6 @@ Parameters:
   ApplicationName:
     Type: String
     Default: etsy-clone-api
-  StageName:
-    Type: String
 Description: >-
   etsy-clone-api
 
@@ -158,8 +156,8 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
-      TableName: !Sub ${ApplicationName}-Products-${StageName}
+      TableName: !Sub ${ApplicationName}-Products-${ServerlessRestApi.Stage}
 Outputs:
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApi.Stage}/"
