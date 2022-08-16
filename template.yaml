@@ -61,10 +61,22 @@ Resources:
           return response
         }
       Events:
-        Api:
+        RootOptions:
           Type: Api
           Properties:
-            Path: /{proxy+}
+            Path: /
+            Method: OPTIONS
+            RestApiId: !Ref ServerlessRestApi
+        GetByIdOptions:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: OPTIONS
+            RestApiId: !Ref ServerlessRestApi
+        StatusOptions:
+          Type: Api
+          Properties:
+            Path: /status
             Method: OPTIONS
             RestApiId: !Ref ServerlessRestApi
 
