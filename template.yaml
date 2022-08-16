@@ -36,6 +36,38 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
+  optionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.options
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Options function to allow cors.
+      InlineCode: |
+        exports.options = async () => {
+          const response = {
+            statusCode: 200,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Headers": "*",
+              "Access-Control-Allow-Origin": "*", // Allow from anywhere
+              "Access-Control-Allow-Methods": "ANY", // Allow all requests
+            },
+          }
+          console.log('optionsResponse:', response)
+          return response
+        }
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /*
+            Method: OPTIONS
+            RestApiId: !Ref ServerlessRestApi
+
   # This is a Lambda function config associated with the source code: get-all-items.js
   getAllItemsFunction:
     Type: AWS::Serverless::Function

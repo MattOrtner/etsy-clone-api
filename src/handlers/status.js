@@ -1,4 +1,3 @@
-// Create a DocumentClient that represents the query to add an item
 exports.statusHandler = async (event) => {
   if (event.httpMethod !== "GET") {
     throw new Error(
@@ -10,6 +9,12 @@ exports.statusHandler = async (event) => {
 
   const response = {
     statusCode: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*", // Allow from anywhere
+      "Access-Control-Allow-Methods": "GET", // Allow only GET request
+    },
   };
 
   // All log statements are written to CloudWatch
