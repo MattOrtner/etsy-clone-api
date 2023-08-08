@@ -30,10 +30,8 @@ export const getAllUsersHandler = async (event) => {
 
   try {
     const data = await ddbDocClient.send(new ScanCommand(params));
-    var users = data.Users;
+    var users = data.Items;
     console.log("users", users);
-    var items = data.Items;
-    console.log("items", items);
   } catch (err) {
     console.log("Error", err);
   }

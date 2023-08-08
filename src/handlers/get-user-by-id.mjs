@@ -7,7 +7,7 @@ const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 // Get the DynamoDB table name from environment variables
-const tableName = process.env.USER_TABLE;
+const tableName = process.env.USERS_TABLE;
 
 /**
  * A simple example includes a HTTP get method to get one user by id from a DynamoDB table.
@@ -33,7 +33,7 @@ export const getUserByIdHandler = async (event) => {
 
   try {
     const data = await ddbDocClient.send(new GetCommand(params));
-    var user = data.User;
+    var user = data.Item;
     console.log("data", data);
   } catch (err) {
     console.log("Error", err);
