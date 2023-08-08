@@ -7,12 +7,12 @@ const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 // Get the DynamoDB table name from environment variables
-const tableName = process.env.SAMPLE_TABLE;
+const tableName = process.env.USERS_TABLE;
 
 /**
  * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
-export const putItemHandler = async (event) => {
+export const putUserHandler = async (event) => {
   if (event.httpMethod !== "POST") {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`
@@ -25,12 +25,14 @@ export const putItemHandler = async (event) => {
   const body = JSON.parse(event.body);
   const id = body.id;
   const name = body.name;
+  const email = body.email;
+  const password = body.password;
 
   // Creates a new item, or replaces an old item with a new item
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
   var params = {
     TableName: tableName,
-    Item: { id: id, name: name },
+    Item: { id: id, name: name, email: email, password: password },
   };
 
   try {
@@ -45,6 +47,11 @@ export const putItemHandler = async (event) => {
   const response = {
     statusCode: 200,
     body: JSON.stringify(body),
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*", // Allow from anywhere
+      "Access-Control-Allow-Methods": "*", // Allow only GET request
+    },
   };
 
   // All log statements are written to CloudWatch

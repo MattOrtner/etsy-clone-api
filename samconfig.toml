@@ -41,3 +41,13 @@ confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 disable_rollback = true
 image_repositories = []
+
+[staging.deploy.parameters]
+stack_name = "etsy-clone-api-staging"
+resolve_s3 = true
+s3_prefix = "etsy-clone-api-staging"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []
