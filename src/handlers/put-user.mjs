@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 // Create clients and set shared const values outside of the handler.
 
 // Create a DocumentClient that represents the query to add an item
@@ -23,7 +25,7 @@ export const putUserHandler = async (event) => {
 
   // Get id and name from the body of the request
   const body = JSON.parse(event.body);
-  const id = body.id;
+  const id = uuidv4();
   const name = body.name;
   const email = body.email;
   const password = body.password;
@@ -32,7 +34,16 @@ export const putUserHandler = async (event) => {
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
   var params = {
     TableName: tableName,
-    Item: { id: id, name: name, email: email, password: password },
+    Item: {
+      id: id,
+      name: name,
+      email: email,
+      password: password,
+      isSignedIn: true,
+      favoriteProducts: [],
+      storeName: "Fake Shop Name",
+      inventory: [],
+    },
   };
 
   try {
