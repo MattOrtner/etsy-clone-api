@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 // Create a DocumentClient that represents the query to add an item
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  GetCommand,
+} from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
@@ -30,40 +34,60 @@ export const putUserHandler = async (event) => {
   const email = body.email;
   const password = body.password;
 
-  // Creates a new item, or replaces an old item with a new item
+  // Build User Object for params
+  const user = {
+    id: id,
+    name: name,
+    email: email,
+    password: password,
+    isSignedIn: true,
+    favoriteProducts: [],
+    storeName: "Fake Shop Name",
+    inventory: [],
+  };
+
+  // Creates a new user, or replaces an old user with a new user
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
   var params = {
     TableName: tableName,
-    Item: {
-      id: id,
-      name: name,
-      email: email,
-      password: password,
-      isSignedIn: true,
-      favoriteProducts: [],
-      storeName: "Fake Shop Name",
-      inventory: [],
-    },
+    Item: user,
   };
+  const response = {};
 
   try {
-    const data = await ddbDocClient.send(new PutCommand(params));
-    console.log("Success - item added or updated", data);
+    const result = await ddbDocClient.send(
+      new GetCommand({
+        TableName: tableName,
+        Key: {
+          email: email,
+        },
+        AttributesToGet: ["email"],
+      })
+    );
+    if (result.Item === undefined) {
+      const data = await ddbDocClient.send(new PutCommand(params));
+      console.log("Success - item added or updated", data);
+      response.statusCode = 200;
+      response.body = JSON.stringify({ ...user, password: "" });
+      response.headers = {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*", // Allow from anywhere
+        "Access-Control-Allow-Methods": "*", // Allow only GET request
+      };
+    } else {
+      response.statusCode = 409;
+      response.body = JSON.stringify({ message: "Email already exists" });
+      response.headers = {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*", // Allow from anywhere
+        "Access-Control-Allow-Methods": "*", // Allow only GET request
+      };
+    }
   } catch (err) {
     //   should return status(500)
     //   body has error message
     console.log("Error", err.stack);
   }
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify(body),
-    headers: {
-      "Access-Control-Allow-Headers": "*",
-      "Access-Control-Allow-Origin": "*", // Allow from anywhere
-      "Access-Control-Allow-Methods": "*", // Allow only GET request
-    },
-  };
 
   // All log statements are written to CloudWatch
   console.info(
