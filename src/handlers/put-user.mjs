@@ -52,7 +52,13 @@ export const putUserHandler = async (event) => {
     TableName: tableName,
     Item: user,
   };
-  const response = {};
+  const response = {
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*", // Allow from anywhere
+      "Access-Control-Allow-Methods": "*", // Allow only GET request
+    },
+  };
 
   try {
     const result = await ddbDocClient.send(
@@ -69,19 +75,9 @@ export const putUserHandler = async (event) => {
       console.log("Success - item added or updated", data);
       response.statusCode = 200;
       response.body = JSON.stringify({ ...user, password: "" });
-      response.headers = {
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Origin": "*", // Allow from anywhere
-        "Access-Control-Allow-Methods": "*", // Allow only GET request
-      };
     } else {
       response.statusCode = 409;
       response.body = JSON.stringify({ message: "Email already exists" });
-      response.headers = {
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Origin": "*", // Allow from anywhere
-        "Access-Control-Allow-Methods": "*", // Allow only GET request
-      };
     }
   } catch (err) {
     //   should return status(500)
