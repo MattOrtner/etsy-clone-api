@@ -86,7 +86,6 @@ export const putUserHandler = async (event) => {
   } catch (err) {
     //   should return status(500)
     //   body has error message
-
     console.log("Error", err.stack);
   }
 
