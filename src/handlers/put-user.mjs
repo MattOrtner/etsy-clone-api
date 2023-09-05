@@ -65,14 +65,18 @@ export const putUserHandler = async (event) => {
       new GetCommand({
         TableName: tableName,
         Key: {
-          email: email,
+          id: `email#${email}`,
         },
-        AttributesToGet: ["email"],
+        AttributesToGet: ["id"],
       })
     );
     if (result.Item === undefined) {
       const data = await ddbDocClient.send(new PutCommand(params));
-      console.log("Success - item added or updated", data);
+      const addEmailAsKey = await ddbDocClient.send(
+        new PutCommand({ TableName: tableName, Item: { id: `email#${email}` } })
+      );
+      console.log("Success - item added User: ", data);
+      console.log("Success - added Email as pk: ", addEmailAsKey);
       response.statusCode = 200;
       response.body = JSON.stringify({ ...user, password: "" });
     } else {
