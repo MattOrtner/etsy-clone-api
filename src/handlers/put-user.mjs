@@ -14,7 +14,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.USERS_TABLE;
-
+import bcrypt from "bcryptjs";
 /**
  * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
@@ -39,13 +39,17 @@ export const putUserHandler = async (event) => {
     id: id,
     name: name,
     email: email,
-    password: password,
     isSignedIn: true,
     favoriteProducts: [],
+    shoppingCart: [],
     storeName: "Fake Shop Name",
     inventory: [],
   };
-
+  if (password) {
+    const salt = bcrypt.genSaltSync(8);
+    const hash = bcrypt.hashSync(password, salt);
+    user.password = hash;
+  }
   // Creates a new user, or replaces an old user with a new user
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
   var params = {
@@ -59,7 +63,7 @@ export const putUserHandler = async (event) => {
       "Access-Control-Allow-Methods": "*", // Allow only GET request
     },
   };
-
+  console.log("user", user);
   try {
     const result = await ddbDocClient.send(
       new GetCommand({
