@@ -42,6 +42,7 @@ export const putUserHandler = async (event) => {
     password: password,
     isSignedIn: true,
     favoriteProducts: [],
+    shoppingCart: [],
     storeName: "Fake Shop Name",
     inventory: [],
   };
