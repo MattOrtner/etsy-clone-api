@@ -13,6 +13,8 @@ const ddbDocClient = DynamoDBDocumentClient.from(client);
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.USERS_TABLE;
 
+import bcrypt from "bcryptjs";
+
 export const signInOutHandler = async (event) => {
   const headers = {
     "Access-Control-Allow-Headers": "*",
@@ -75,17 +77,21 @@ export const signInOutHandler = async (event) => {
     );
 
     const user = fullUserResult.Item;
-    console.info("user", user);
+
     if (isSigningIn) {
-      if (user.password !== password) {
-        return {
-          headers,
-          statusCode: 401,
-          body: JSON.stringify({
-            message: "Unauthorized - Invalid email/password combination",
-          }),
-        };
-      }
+      bcrypt.compare(password, user.password, function (err, res) {
+        if (res) {
+          return {
+            headers,
+            statusCode: 401,
+            body: JSON.stringify({
+              message: "Unauthorized - Invalid email/password combination",
+            }),
+          };
+        } else if (err) {
+          console.info("err", err);
+        }
+      });
       // Update isSignedIn status
       await ddbDocClient.send(
         new PutCommand({
