@@ -14,7 +14,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.USERS_TABLE;
-
+import bcrypt from "bcryptjs";
 /**
  * A simple example includes a HTTP post method to add one item to a DynamoDB table.
  */
@@ -39,53 +39,62 @@ export const putUserHandler = async (event) => {
     id: id,
     name: name,
     email: email,
-    password: password,
     isSignedIn: true,
     favoriteProducts: [],
+    shoppingCart: [],
     storeName: "Fake Shop Name",
     inventory: [],
   };
-
+  if (password) {
+    const salt = bcrypt.genSaltSync(8);
+    const hash = bcrypt.hashSync(password, salt);
+    user.password = hash;
+  }
   // Creates a new user, or replaces an old user with a new user
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
   var params = {
     TableName: tableName,
     Item: user,
   };
-  const response = {};
-
+  const response = {
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*", // Allow from anywhere
+      "Access-Control-Allow-Methods": "*", // Allow only GET request
+    },
+  };
+  console.log("user", user);
   try {
     const result = await ddbDocClient.send(
       new GetCommand({
         TableName: tableName,
         Key: {
-          email: email,
+          id: `email#${email}`,
         },
-        AttributesToGet: ["email"],
+        AttributesToGet: ["id"],
       })
     );
+
     if (result.Item === undefined) {
       const data = await ddbDocClient.send(new PutCommand(params));
-      console.log("Success - item added or updated", data);
+      const addEmailAsKey = await ddbDocClient.send(
+        new PutCommand({
+          TableName: tableName,
+          Item: { id: `email#${email}`, userId: id },
+        })
+      );
+      console.log("Success - item added User: ", data);
+      console.log("Success - added Email as pk: ", addEmailAsKey);
       response.statusCode = 200;
       response.body = JSON.stringify({ ...user, password: "" });
-      response.headers = {
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Origin": "*", // Allow from anywhere
-        "Access-Control-Allow-Methods": "*", // Allow only GET request
-      };
     } else {
       response.statusCode = 409;
       response.body = JSON.stringify({ message: "Email already exists" });
-      response.headers = {
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Origin": "*", // Allow from anywhere
-        "Access-Control-Allow-Methods": "*", // Allow only GET request
-      };
     }
   } catch (err) {
     //   should return status(500)
     //   body has error message
+
     console.log("Error", err.stack);
   }
 
