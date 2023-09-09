@@ -28,7 +28,7 @@ Resources:
   getAllUsersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-all-users.getAllUsersHandler
+      Handler: src/handlers/users/get-all-users.getAllUsersHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -56,7 +56,7 @@ Resources:
   getUserByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-user-by-id.getUserByIdHandler
+      Handler: src/handlers/users/get-user-by-id.getUserByIdHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -84,7 +84,7 @@ Resources:
   putUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/put-user.putUserHandler
+      Handler: src/handlers/users/put-user.putUserHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -112,7 +112,7 @@ Resources:
   signInOutFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/sign-in-out.signInOutHandler
+      Handler: src/handlers/users/sign-in-out.signInOutHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -137,7 +137,7 @@ Resources:
   deleteUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/delete-user.deleteUserHandler
+      Handler: src/handlers/users/delete-user.deleteUserHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
