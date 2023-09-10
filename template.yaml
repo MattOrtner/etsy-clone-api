@@ -215,6 +215,34 @@ Resources:
             Path: /api/products
             Method: POST
 
+  getAllUserInventoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/products/get-all-user-inventory.getAllUserInventoryHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: An HTTP method to get all products for Users Inventory from the ProductsTable
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          PRODUCTS_TABLE: !Ref ProductsTable
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/products/user/inventory/{id}
+            Method: GET
+
   deleteProductFunction:
     Type: AWS::Serverless::Function
     Properties:
