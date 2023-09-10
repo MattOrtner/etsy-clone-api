@@ -133,7 +133,8 @@ Resources:
           Properties:
             Path: /api/users/signInOut
             Method: PUT
-  # This is a Lambda function config associated with the source code: put-item.js
+
+  # This is a Lambda function config associated with the source code: delete-user.js
   deleteUserFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -159,7 +160,7 @@ Resources:
             Path: /api/users/delete-profile
             Method: DELETE
 
-  # This is a Lambda function config associated with the source code: put-item.js
+  # This is a Lambda function config associated with the source code: get-all-products.js
   getAllProductsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -213,6 +214,34 @@ Resources:
           Properties:
             Path: /api/products
             Method: POST
+
+  deleteProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/products/delete-product.deleteProductHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: An HTTP put method to delete Product from the ProductsTable
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ProductTable & UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          PRODUCTS_TABLE: !Ref ProductsTable
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/products/delete-product
+            Method: DELETE
 
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
