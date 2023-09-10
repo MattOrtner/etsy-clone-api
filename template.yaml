@@ -28,7 +28,7 @@ Resources:
   getAllUsersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-all-users.getAllUsersHandler
+      Handler: src/handlers/users/get-all-users.getAllUsersHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -56,7 +56,7 @@ Resources:
   getUserByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-user-by-id.getUserByIdHandler
+      Handler: src/handlers/users/get-user-by-id.getUserByIdHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -84,7 +84,7 @@ Resources:
   putUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/put-user.putUserHandler
+      Handler: src/handlers/users/put-user.putUserHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -112,7 +112,7 @@ Resources:
   signInOutFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/sign-in-out.signInOutHandler
+      Handler: src/handlers/users/sign-in-out.signInOutHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -137,7 +137,7 @@ Resources:
   deleteUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/delete-user.deleteUserHandler
+      Handler: src/handlers/users/delete-user.deleteUserHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -158,6 +158,61 @@ Resources:
           Properties:
             Path: /api/users/delete-profile
             Method: DELETE
+
+  # This is a Lambda function config associated with the source code: put-item.js
+  getAllProductsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/products/get-all-products.getAllProductsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: An HTTP method to get all products from the ProductsTable
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          PRODUCTS_TABLE: !Ref ProductsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/products
+            Method: GET
+
+    # This is a Lambda function config associated with the source code: post-product.js
+  postProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/products/post-product.postProductHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: An HTTP post method to add one Product to the Products Table.
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          PRODUCTS_TABLE: !Ref ProductsTable
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/products
+            Method: POST
 
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
